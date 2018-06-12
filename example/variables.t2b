@@ -1,0 +1,10 @@
+# Use `set` to assign a GLOBAL variable.
+set foo (u8 33)
+
+# Use `get` to retrieve the current value.
+set bar (get foo)
+
+# Loops are fun
+times 10
+    str (get bar)
+endtimes

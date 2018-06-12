@@ -1,0 +1,10 @@
+# Using parentheses, we can use the outputs of commands as inputs.
+#
+# Let's be verbose and write out "T2B!!!".
+times 5
+    str (u8 84)
+    str (u8 50)
+    str (u8 66)
+    times 10 str (u8 33) endtimes
+    endl
+endtimes

@@ -1,0 +1,20 @@
+# `if` handles u8 only. Do as you will.
+if (u8 1)
+    strl "true == true"
+endif
+
+if (not (u8 0))
+    strl "!false == true"
+endif
+
+if (not (u8 1))
+    strl "This never prints."
+endif
+
+if (= (str 2) (str 2))
+    strl "2 == 2"
+endif
+
+if (= (str 24) (str 2))
+    strl "This never prints either."
+endif

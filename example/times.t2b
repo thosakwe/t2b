@@ -1,0 +1,12 @@
+strl "Programmers love powers of 2. How about 2^4?"
+endl
+
+times 2
+    times 2
+        times 2
+            times 2
+                str loop!
+            endtimes
+        endtimes
+    endtimes
+endtimes

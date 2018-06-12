@@ -1,0 +1,44 @@
+# Create a simple macro.
+macro emit_times value count
+begin
+    str "Emitting value: \""
+    get value
+    str "\" "
+    get count
+    str " time(s)!"
+    endl
+    endl
+
+    times (get count)
+        get value
+        endl
+    endtimes
+endmacro
+
+# Call it!
+#emit_times "Hello!" 34
+
+# Yes, you can technically nest macros and create them dynamically.
+
+# We'll even dynamically create their names.
+macro create_macro_name
+begin
+    str dyn_macro
+    get i
+endmacro
+
+
+macro create_dynamic_macros count
+begin
+    times (get count)
+        macro (create_macro_name)
+        begin
+            strl "Wow! This is a dynamic macro."
+        endmacro
+    endtimes
+endmacro
+
+create_dynamic_macros 23
+
+dyn_macro16
+dyn_macro4
