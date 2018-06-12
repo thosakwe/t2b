@@ -12,7 +12,7 @@ $ t2b <filename> here
 $ t2b # Read directly from stdin
 ```
 
-`t2b` always writes to stdout. To output to a file, simply use a pipe (`|`).
+`t2b` always writes to stdout. To output to a file, simply use a greater-than sign (`>`).
 
 ## Language
 Newlines are solely for the sake of readability; all whitespace is the same.
