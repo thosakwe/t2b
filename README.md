@@ -4,6 +4,8 @@ Supports comments, looping, Unicode, variables, conditionals, macros and recursi
 
 TLDR; Check out `example/`.
 
+Pre-built binaries are available for Win64 and MacOS64.
+
 ## Usage
 ```bash
 $ t2b <filename> here
