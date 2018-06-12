@@ -125,7 +125,12 @@ std::string getstring(std::istream &stream, string_map &variables, macro_map &ma
         else if (ch == '\\') {
             ch = (char) stream.get();
 
-            if (ch != 'u' || (!stream.eof() && stream.peek() != '{'))
+            if (ch == 'b') ss += '\b';
+            if (ch == 'f') ss += '\f';
+            if (ch == 'r') ss += '\r';
+            if (ch == 'n') ss += '\n';
+            if (ch == 't') ss += '\t';
+            else if (ch != 'u' || (!stream.eof() && stream.peek() != '{'))
                 ss += ch;
             else {
                 std::string number;
