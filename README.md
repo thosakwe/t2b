@@ -73,7 +73,7 @@ set foo (u8 33)
 set bar (get foo)
 
 # Emit its value 3 times.
-times 3 get foo
+times 3 get foo endtimes
 
 # Create a simple macro.
 macro emit_twice x
