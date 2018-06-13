@@ -5,6 +5,7 @@
 // Use of this source code is governed by an
 // GPL license that can be found in the LICENSE file.
 #include <cstdint>
+#include <cstring>
 #include <ctime>
 #include <map>
 #include <vector>
