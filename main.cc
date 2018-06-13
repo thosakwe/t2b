@@ -68,6 +68,17 @@ void skipwspace(std::istream &stream) {
     while (!stream.eof() && iswspace(stream.peek())) stream.ignore();
 }
 
+std::string trim(const std::string& str)
+{
+    size_t first = str.find_first_not_of(' ');
+    if (std::string::npos == first)
+    {
+        return str;
+    }
+    size_t last = str.find_last_not_of(' ');
+    return str.substr(first, (last - first + 1));
+}
+
 std::string getstring(std::istream &stream, string_map &variables, macro_map &macros, bool hexMode) {
     skipwspace(stream);
     if (stream.eof()) return std::string("");
@@ -114,7 +125,7 @@ std::string getstring(std::istream &stream, string_map &variables, macro_map &ma
         skipwspace(stream);
         stream >> str;
         //std::getline(stream, str);
-        return str;
+        return trim(str);
     }
 
     std::string ss;
@@ -162,7 +173,7 @@ int exec(std::istream &stream, std::ostream &out, string_map &variables, macro_m
     while (!stream.eof()) {
         stream >> command;
 
-        if (command.empty()) continue;
+        if (command.empty() || stream.eof()) continue;
 
         HANDLE_NUM(command, "i8", stream, int8_t, 8, hexMode);
         HANDLE_NUM(command, "i16", stream, int16_t, 16, hexMode);
@@ -194,6 +205,14 @@ int exec(std::istream &stream, std::ostream &out, string_map &variables, macro_m
             continue;
         } else if (command == "hex") {
             return exec(stream, out, variables, macros, !hexMode);
+        } else if (command == "len") {
+            std::string str = getstring(stream, variables, macros, hexMode);
+            uint64_t len = str.length();
+            out.write(reinterpret_cast<const char *>(&len), sizeof len);
+        } else if (command == "size") {
+            std::string str = getstring(stream, variables, macros, hexMode);
+            uint64_t size = str.size();
+            out.write(reinterpret_cast<const char *>(&size), sizeof size);
         } else if (command == "str") {
             std::string str = getstring(stream, variables, macros, hexMode);
             out << str;

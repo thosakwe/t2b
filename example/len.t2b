@@ -1,0 +1,4 @@
+# Calling `size` writes a u64, the size of whatever input it was passed.
+#
+# For example, we can write a ! by outputting the number 33.
+str (size (times 33 u8 2))
