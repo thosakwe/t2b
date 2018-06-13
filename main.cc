@@ -173,7 +173,7 @@ int exec(std::istream &stream, std::ostream &out, string_map &variables, macro_m
     while (!stream.eof()) {
         stream >> command;
 
-        if (command.empty() || stream.eof()) continue;
+        if (stream.fail()) continue;
 
         HANDLE_NUM(command, "i8", stream, int8_t, 8, hexMode);
         HANDLE_NUM(command, "i16", stream, int16_t, 16, hexMode);
