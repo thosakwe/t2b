@@ -95,6 +95,8 @@ Now there's a lightweight way to do just that.
 ## Supported Commands
 * `u8...u64` - Emit unsigned integer
 * `i8...i64` - Emit signed integer
+* `f` - Emit float
+* `d` - Emit double
 * `hex` - Toggle hex mode on/off (defaults to OFF)
 * `str <expr>` - Write a string
 * `strl <expr>` - Write a string AND newline

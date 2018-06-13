@@ -1,4 +1,33 @@
 # Calling `size` writes a u64, the size of whatever input it was passed.
 #
 # For example, we can write a ! by outputting the number 33.
-str (size (times 33 u8 2))
+#size (times 33 u8 1 endtimes)
+#return
+
+# Calling `len` is the equivalent of calling the C function `strlen`.
+# So, as you can imagine, anything after a zero is not counted.
+set the_length (len (times 33 u8 0 endtimes))
+get the_length
+
+#if (not (= (get the_length) (u64 0)))
+#    strl "This will never be printed, because `len` returned 0!"
+#endif
+return
+
+# Applied usage...
+macro empty s
+begin
+    if (= (len (get s)) (u64 0))
+        u8 1
+        return
+    endif
+    u8 0
+endmacro
+
+if (empty "")
+    str "Empty strings have a length of zero."
+endif
+
+if (empty "Hello!!!")
+    strl "This will never print, because \"Hello!!\" is not empty."
+endif

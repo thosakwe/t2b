@@ -61,3 +61,6 @@ crashlytics.properties
 crashlytics-build.properties
 fabric.properties
 bin/
+
+*.zip
+*.cbp
