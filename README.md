@@ -25,13 +25,14 @@ Newlines are solely for the sake of readability; all whitespace is the same.
 # Emit a byte. In DECIMAL.
 u8 10
 
-# Toggle hex mode ON.
-# In hex mode, numbers will be interpreted as hexadecimal.
-hex
-u8 10
+# Emit a byte in hex.
+u8 0xa
 
-# Toggle hex mode OFF.
-hex
+# Octal
+u16 0o777
+
+# And, of course, binary.
+u8 0b00001110
 
 # Spit out a signed integer.
 i64 25677
@@ -108,6 +109,9 @@ Now there's a lightweight way to do just that.
 * `=` - Compare two values, return `0` or `1`
 * `times <count> <pred> endtimes` - Execute `<pred>` `<count>` times. `i` is always set to the current iteration's index.
 * `macro <name> <param-names...> begin <pred> endmacro` - Declare a custom macro named `<name>`.
+* `return` - End termination of the current macro. Exits the script if not in a macro.
+* `size` - Return the size of an item
+* `len` - Equivalent to C `strlen`
 
 # What's next?
 It's now feasible to write a machine code compiler in shell. Hooray.

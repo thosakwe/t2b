@@ -17,7 +17,7 @@ namespace t2b {
     typedef std::map<std::string, std::string> string_map;
     typedef std::map<std::string, t2b_function> macro_map;
 
-    int exec(std::istream &stream, std::ostream &out, string_map &variables, macro_map &macros, bool hexMode);
+    int exec(std::istream &stream, std::ostream &out, string_map &variables, macro_map &macros);
 }
 
 #endif //T2B_T2B_H

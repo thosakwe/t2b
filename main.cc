@@ -20,7 +20,7 @@ int main(int argc, const char **argv) {
     string_map variables;
     macro_map macros;
 
-    if (argc < 2) return exec(std::cin, std::cout, variables, macros, false);
+    if (argc < 2) return exec(std::cin, std::cout, variables, macros);
 
     if (strcmp(argv[1], "-h") == 0 || strcmp(argv[1], "--help") == 0) {
         time_t rawtime;
@@ -42,5 +42,5 @@ int main(int argc, const char **argv) {
         return 1;
     }
 
-    return exec(ifs, std::cout, variables, macros, false);
+    return exec(ifs, std::cout, variables, macros);
 }
