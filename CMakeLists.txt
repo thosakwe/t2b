@@ -3,7 +3,9 @@ project(t2b)
 
 set(CMAKE_CXX_STANDARD 11)
 set(T2B_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/include)
-set(T2B_SOURCES src/t2b.cc include/t2b/t2b.hpp src/ast.cpp include/t2b/ast.hpp src/value.cpp src/value.hpp)
+set(T2B_SOURCES src/t2b.cc include/t2b/t2b.hpp src/ast.cpp
+        include/t2b/ast.hpp src/value.cpp include/t2b/value.hpp
+        src/visitor.cpp include/t2b/visitor.hpp)
 
 add_library(t2b SHARED ${T2B_SOURCES})
 add_library(t2b_static STATIC ${T2B_SOURCES})

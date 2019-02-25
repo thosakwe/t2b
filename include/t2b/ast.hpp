@@ -7,15 +7,22 @@
 #ifndef T2B_AST_HPP
 #define T2B_AST_HPP
 
+#include <memory>
 #include <string>
 #include <vector>
 #include <t2b/value.hpp>
 
 namespace t2b
 {
-    class t2b_visitor;
+    class visitor;
 
-    class value_ctx
+    class ast_node
+    {
+    public:
+        virtual void accept(visitor &visitor) = 0;
+    };
+
+    class value_ctx : public ast_node
     {
 
     };
@@ -31,11 +38,8 @@ namespace t2b
         value constant;
     };
 
-    class stmt_ctx
+    class stmt_ctx : public ast_node
     {
-    public:
-        // TODO: Make this generic?
-        virtual void accept(t2b_visitor &visitor) = 0;
     };
 
     class macro_ctx
@@ -44,12 +48,18 @@ namespace t2b
         std::vector<stmt_ctx> body;
     };
 
-    struct if_stmt_ctx : public stmt_ctx
+    class value_stmt_ctx : public stmt_ctx
     {
-
+        std::unique_ptr<value_ctx> value;
     };
 
-    struct manda_stmt_ctx : public stmt_ctx
+    struct if_stmt_ctx : public stmt_ctx
+    {
+        std::unique_ptr<value_ctx> condition;
+        std::vector<stmt_ctx> body;
+    };
+
+    struct macro_stmt_ctx : public stmt_ctx
     {
         macro_ctx macro;
     };
