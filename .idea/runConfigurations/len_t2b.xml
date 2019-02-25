@@ -1,6 +1,7 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="len.t2b" type="CMakeRunConfiguration" factoryName="Application" singleton="true" PROGRAM_PARAMS="len.t2b" WORKING_DIR="file://$PROJECT_DIR$/example" PASS_PARENT_ENVS_2="true" PROJECT_NAME="t2b" TARGET_NAME="t2b" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="t2b" RUN_TARGET_NAME="t2b">
-    <envs />
-    <method />
+    <method v="2">
+      <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+    </method>
   </configuration>
 </component>
