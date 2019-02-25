@@ -12,7 +12,7 @@
 #include <fstream>
 #include <iostream>
 #include <sstream>
-#include <t2b.hpp>
+#include <t2b/t2b.hpp>
 
 using namespace t2b;
 

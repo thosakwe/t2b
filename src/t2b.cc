@@ -13,7 +13,7 @@
 #include <iostream>
 #include <sstream>
 #include <regex>
-#include <t2b.hpp>
+#include <t2b/t2b.hpp>
 
 using namespace t2b;
 
