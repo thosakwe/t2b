@@ -7,7 +7,11 @@
 #ifndef T2B_T2B_H
 #define T2B_T2B_H
 
-namespace t2b {
+#include <string>
+#include <vector>
+
+namespace t2b
+{
     typedef struct
     {
         std::vector<std::string> parameters;
