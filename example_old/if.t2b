@@ -1,14 +1,9 @@
-# `if` handles values as booleans.
-
-if 1
-    strl "true32 == true32"
-endif
-
+# `if` handles u8 only. Do as you will.
 if (u8 1)
-    strl "true8 == true8"
+    strl "true == true"
 endif
 
-if (!(u8 0))
+if (not (u8 0))
     strl "!false == true"
 endif
 
@@ -18,10 +13,6 @@ endif
 
 if (= (str 2) (str 2))
     strl "2 == 2"
-endif
-
-if ((str 24) == (str 2))
-    strl "This never prints either."
 endif
 
 if (= (str 24) (str 2))
