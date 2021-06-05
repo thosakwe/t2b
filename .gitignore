@@ -64,3 +64,4 @@ bin/
 
 *.zip
 *.cbp
+.clangd
