@@ -3,7 +3,7 @@ module T2B.Parser where
 import Control.Monad.Error.Class (throwError)
 import T2B
 import T2B.AST
-import Text.Parsec (choice, many, manyTill, getPosition, parse, try, (<|>))
+import Text.Parsec (choice, many, manyTill, getPosition, parse, try, (<|>), optionMaybe)
 import Text.Parsec.Language (emptyDef)
 import Text.Parsec.String (Parser)
 import Text.Parsec.Token (commentLine, reservedNames)
@@ -25,7 +25,7 @@ parser = many command
 command :: Parser (AstNode Command)
 command = do
   spaces
-  choice $ [d, endl, f, get, hex, len, strl, str, times]
+  choice $ [d, endl, f, get, hex, len, macro, set, strl, str, times, macroExpansion]
 
 d :: Parser (AstNode Command)
 d = do
@@ -67,6 +67,30 @@ len = do
   value <- expr
   return $ (pos, LenCommand value)
 
+macro :: Parser (AstNode Command)
+macro = do
+  pos <- getPosition
+  _ <- Tok.reserved lexer "macro"
+  name <- expr
+  params <- manyTill expr $ Tok.reserved lexer "begin"
+  commands <- manyTill command $ Tok.reserved lexer "endmacro"
+  return $ (pos, MacroCommand name params commands)
+
+macroExpansion :: Parser (AstNode Command)
+macroExpansion = do
+  pos <- getPosition
+  (_, name) <- identifier
+  args <- many expr
+  return (pos, MacroExpansion (pos, Reference name) args)
+
+set :: Parser (AstNode Command)
+set = do
+  pos <- getPosition
+  _ <- Tok.reserved lexer "set"
+  key <- expr
+  value <- expr
+  return $ (pos, SetCommand key value)
+
 size :: Parser (AstNode Command)
 size = do
   pos <- getPosition
@@ -99,7 +123,7 @@ times = do
 expr :: Parser (AstNode Expr)
 expr = do
   spaces
-  choice [stringLiteral, number, interpolation]
+  choice [stringLiteral, number, interpolation, reference]
 
 -- Create a lexer for integers, floats
 -- () is the state type for the TokenParser, which in this case has no state.
@@ -109,8 +133,8 @@ lexer = Tok.makeTokenParser emptyDef
   {
     commentLine = "#",
     reservedNames  = [
-      "d", "endl", "f", "get", "hex", "i8", "i16", "i32", "i64", "u8", "u16",
-      "u32", "u64", "len", "size", "str", "strl", "times", "endtimes"
+      "begin", "d", "endl", "endmacro", "f", "get", "hex", "i8", "i16", "i32", "i64", "u8", "u16",
+      "u32", "u64", "len", "macro", "set", "size", "str", "strl", "times", "endtimes"
     ]
   }
 
@@ -140,7 +164,20 @@ interpolation :: Parser (AstNode Expr)
 interpolation = do
   pos <- getPosition
   value <- Tok.parens lexer command
-  return $ (pos, Interpolation value)
+  return (pos, Interpolation value)
+
+reference :: Parser (AstNode Expr)
+reference = do
+  pos <- getPosition
+  (_, value) <- identifier
+  return (pos, Reference value)
+
+identifier :: Parser (AstNode String)
+identifier = do
+  spaces
+  pos <- getPosition
+  value <- Tok.identifier lexer
+  return (pos, value)
 
 spaces :: Parser ()
 spaces = do

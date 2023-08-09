@@ -5,7 +5,7 @@ import Control.Monad.IO.Class (liftIO)
 import System.Environment
 import System.Exit (exitFailure)
 import System.IO (hPutStrLn, stderr)
-import T2B (runT2B, T2BError (InvalidCommand, SyntaxError, MissingVar))
+import T2B (runT2B, T2BError (InvalidCommand, SyntaxError, MissingVar, MissingMacro))
 import T2B.Interpreter (exec)
 import T2B.Parser (parseT2B)
 import Text.Parsec (parse)
@@ -36,6 +36,9 @@ main = do
     -- Handle errors
     Left (InvalidCommand command) -> do
       hPutStrLn stderr $ "Invalid command: " ++ (Text.unpack command)
+      exitFailure
+    Left (MissingMacro pos varName) -> do
+      hPutStrLn stderr $ (show pos) ++ ": Missing macro: " ++ varName
       exitFailure
     Left (MissingVar pos varName) -> do
       hPutStrLn stderr $ (show pos) ++ ": Missing variable: " ++ varName

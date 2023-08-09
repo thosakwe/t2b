@@ -8,7 +8,7 @@ import qualified Data.Map as Map
 -- | Represents a lexical scope containing variable bindings.
 data Scope a
   = RootScope (Map String a)
-  | ChildScope (Scope a, Map String a)
+  | ChildScope (Scope a) (Map String a)
   deriving (Show)
 
 -- | Creates an empty root scope with no variable bindings.
@@ -19,7 +19,7 @@ empty = RootScope Map.empty
 -- found, delegates to its parent scope.
 lookup :: String -> Scope a -> Maybe a
 lookup key (RootScope m) = Map.lookup key m
-lookup key (ChildScope (parent, m)) =
+lookup key (ChildScope parent m) =
   case Map.lookup key m of
     Just value -> Just value
     Nothing -> T2B.Scope.lookup key parent
@@ -27,9 +27,19 @@ lookup key (ChildScope (parent, m)) =
 -- | Inserts a variable binding into a scope.
 insert :: String -> a -> Scope a -> Scope a
 insert key value (RootScope m) = RootScope $ Map.insert key value m
-insert key value (ChildScope (parent, m)) = ChildScope (parent, Map.insert key value m)
+insert key value (ChildScope parent m) = ChildScope parent $ Map.insert key value m
+
+insertAll :: [(String, a)] -> Scope a -> Scope a
+
+insertAll newValues (RootScope values) =
+  let newMap = Map.union (Map.fromList newValues) values
+  in RootScope newMap
+
+insertAll newValues (ChildScope parent values) =
+  let newMap = Map.union (Map.fromList newValues) values
+  in ChildScope parent newMap
 
 -- | Creates a new child scope based on an existing scope.
 -- The child scope inherits the parent's bindings but can have its own additional bindings.
 createChild :: Scope a -> Scope a
-createChild scope = ChildScope (scope, Map.empty)
+createChild scope = ChildScope scope Map.empty

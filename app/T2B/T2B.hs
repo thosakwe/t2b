@@ -9,6 +9,7 @@ import Control.Monad.Writer (tell)
 import Data.ByteString (ByteString)
 import Data.Text (Text)
 import System.IO (hPutStrLn, stderr)
+import T2B.AST (AstNode, Command)
 import T2B.Scope (Scope)
 import Text.Parsec (ParseError, SourcePos)
 
@@ -22,6 +23,7 @@ type T2B = ExceptT T2BError (StateT T2BState IO)
 -- | Represents different error cases that can occur during T2B parsing.
 data T2BError
   = InvalidCommand Text -- ^ An error indicating an invalid command encountered during parsing.
+  | MissingMacro SourcePos String
   | MissingVar SourcePos String
   | SyntaxError ParseError
   deriving (Show)
@@ -30,20 +32,24 @@ data T2BError
 data T2BState = T2BState
   { 
     hexMode :: Bool,
+    macros :: Scope Macro,
     variables :: Scope ByteString -- ^ The scope of variables available during parsing.
   } deriving (Show)
+
+type Macro = (String, [String], [AstNode Command])
 
 -- | Creates an initial empty state for the T2B parser.
 emptyState :: T2BState
 emptyState = T2BState
   {
     hexMode = False,
+    macros = Scope.empty,
     variables = Scope.empty
   }
 
 -- | Logs a message to stderr.
-logToStderr :: String -> T2B ()
-logToStderr = liftIO . (hPutStrLn stderr)
+logToStderr :: Show a => a -> T2B ()
+logToStderr = liftIO . (hPutStrLn stderr) . show
 
 -- | Runs a T2B action, and returns the resulting ByteString if no error
 -- occurred.
