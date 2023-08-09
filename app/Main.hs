@@ -1,11 +1,11 @@
 module Main where
 
 import T2B (runT2B, T2BError (InvalidCommand))
+import System.IO (hPutStrLn, stderr)
+import System.Exit (exitFailure)
 
 import qualified Data.ByteString.Char8 as BS
 import qualified Data.Text as Text
-import System.IO (hPutStrLn, stderr)
-import System.Exit (exitFailure)
 
 main :: IO ()
 main = do
@@ -14,7 +14,7 @@ main = do
     return ()
 
   case result of
-    Right (bs) -> BS.putStr bs
+    Right byteString -> BS.putStr byteString
 
     -- Handle errors
     Left (InvalidCommand command) -> do
