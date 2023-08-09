@@ -1,6 +1,6 @@
 module T2B.Interpreter where
 
-import Control.Monad.Trans (MonadTrans(lift))
+import Control.Monad.Trans (MonadTrans(lift), MonadIO (liftIO))
 import Control.Monad.State (modify, gets, get, StateT (runStateT), withStateT, put)
 import Data.ByteString (ByteString)
 import T2B
@@ -9,6 +9,7 @@ import T2B.AST
 import qualified Data.ByteString.Char8 as BS
 import qualified T2B.Scope as Scope
 import qualified T2B.Scope as Scope
+import Control.Monad.Error.Class (throwError)
 
 exec :: [AstNode Command] -> T2B ByteString
 exec commands = do
@@ -28,6 +29,13 @@ execCommand (_, FCommand expr) = do
   result <- execExpr expr
   str <- readDouble result
   return . BS.pack . show $ str
+
+execCommand (pos, GetCommand expr) = do
+  scope <- lift $ gets variables
+  varName <- BS.unpack <$> execExpr expr
+  case Scope.lookup varName scope of
+    Nothing -> throwError $ MissingVar pos varName
+    Just value -> return value
 
 execCommand (_, HexCommand) = do
   lift . modify $ \state -> state { hexMode = True }

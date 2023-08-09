@@ -25,7 +25,7 @@ parser = many command
 command :: Parser (AstNode Command)
 command = do
   spaces
-  choice $ [d, endl, f, hex, len, strl, str, times]
+  choice $ [d, endl, f, get, hex, len, strl, str, times]
 
 d :: Parser (AstNode Command)
 d = do
@@ -46,6 +46,13 @@ f = do
   _ <- Tok.reserved lexer "f"
   value <- expr
   return $ (pos, FCommand value)
+
+get :: Parser (AstNode Command)
+get = do
+  pos <- getPosition
+  _ <- Tok.reserved lexer "get"
+  value <- expr
+  return $ (pos, GetCommand value)
 
 hex :: Parser (AstNode Command)
 hex = do
@@ -102,8 +109,8 @@ lexer = Tok.makeTokenParser emptyDef
   {
     commentLine = "#",
     reservedNames  = [
-      "d", "endl", "f", "hex", "i8", "i16", "i32", "i64", "u8", "u16", "u32",
-      "u64", "len", "size", "str", "strl", "times", "endtimes"
+      "d", "endl", "f", "get", "hex", "i8", "i16", "i32", "i64", "u8", "u16",
+      "u32", "u64", "len", "size", "str", "strl", "times", "endtimes"
     ]
   }
 

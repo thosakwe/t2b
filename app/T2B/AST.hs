@@ -10,6 +10,7 @@ data Command =
   DCommand (AstNode Expr)
   | EndlCommand
   | FCommand (AstNode Expr)
+  | GetCommand (AstNode Expr)
   | HexCommand
   | LenCommand (AstNode Expr)
   | SizeCommand (AstNode Expr)

@@ -10,7 +10,7 @@ import Data.ByteString (ByteString)
 import Data.Text (Text)
 import System.IO (hPutStrLn, stderr)
 import T2B.Scope (Scope)
-import Text.Parsec (ParseError)
+import Text.Parsec (ParseError, SourcePos)
 
 import qualified T2B.Scope as Scope
 
@@ -22,6 +22,7 @@ type T2B = ExceptT T2BError (StateT T2BState IO)
 -- | Represents different error cases that can occur during T2B parsing.
 data T2BError
   = InvalidCommand Text -- ^ An error indicating an invalid command encountered during parsing.
+  | MissingVar SourcePos String
   | SyntaxError ParseError
   deriving (Show)
 
