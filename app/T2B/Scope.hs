@@ -7,8 +7,8 @@ import qualified Data.Map as Map
 
 -- | Represents a lexical scope containing variable bindings.
 data Scope a
-  = RootScope (Map Text a)
-  | ChildScope (Scope a, Map Text a)
+  = RootScope (Map String a)
+  | ChildScope (Scope a, Map String a)
   deriving (Show)
 
 -- | Creates an empty root scope with no variable bindings.
@@ -17,7 +17,7 @@ empty = RootScope Map.empty
 
 -- | Looks up a variable in a scope. It searches the current scope and, if not
 -- found, delegates to its parent scope.
-lookup :: Text -> Scope a -> Maybe a
+lookup :: String -> Scope a -> Maybe a
 lookup key (RootScope m) = Map.lookup key m
 lookup key (ChildScope (parent, m)) =
   case Map.lookup key m of
@@ -25,7 +25,7 @@ lookup key (ChildScope (parent, m)) =
     Nothing -> T2B.Scope.lookup key parent
 
 -- | Inserts a variable binding into a scope.
-insert :: Text -> a -> Scope a -> Scope a
+insert :: String -> a -> Scope a -> Scope a
 insert key value (RootScope m) = RootScope $ Map.insert key value m
 insert key value (ChildScope (parent, m)) = ChildScope (parent, Map.insert key value m)
 

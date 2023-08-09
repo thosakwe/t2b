@@ -29,7 +29,7 @@ data T2BError
 data T2BState = T2BState
   { 
     hexMode :: Bool,
-    variables :: Scope Text -- ^ The scope of variables available during parsing.
+    variables :: Scope ByteString -- ^ The scope of variables available during parsing.
   } deriving (Show)
 
 -- | Creates an initial empty state for the T2B parser.

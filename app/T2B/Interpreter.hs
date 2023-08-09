@@ -1,12 +1,14 @@
 module T2B.Interpreter where
 
+import Control.Monad.Trans (MonadTrans(lift))
+import Control.Monad.State (modify, gets, get, StateT (runStateT), withStateT, put)
 import Data.ByteString (ByteString)
 import T2B
 import T2B.AST
 
 import qualified Data.ByteString.Char8 as BS
-import Control.Monad.Trans (MonadTrans(lift))
-import Control.Monad.State (modify)
+import qualified T2B.Scope as Scope
+import qualified T2B.Scope as Scope
 
 exec :: [AstNode Command] -> T2B ByteString
 exec commands = do
@@ -49,10 +51,23 @@ execCommand (_, StrlCommand msgExpr) = do
 execCommand (_, TimesCommand countExpr commands) = do
   countStr <- execExpr countExpr
   let count = read (BS.unpack countStr) :: Int
-  let run = do
+  let
+    iter :: Int -> T2B ByteString
+    iter = \i -> do
+        -- Create a new child scope where the variable i is set
+        currentState <- lift $ get
+        let newScope = Scope.createChild $ variables currentState
+        let scopeWithI = Scope.insert "i" (BS.pack $ show i) newScope
+        -- Create a new child state with this scope
+        let newState = currentState { variables = scopeWithI }
+        -- Now, run the commands in the new state
+        lift $ put newState
         output <- mapM execCommand commands
+        -- Go back to the old state
+        lift $ put currentState
+        -- Concat everything and return it
         return $ foldl (<>) BS.empty output
-  results <- loop count run  []
+  results <- loop iter count
   return $ foldl (<>) BS.empty results
 
 execExpr :: AstNode Expr -> T2B ByteString
@@ -66,11 +81,15 @@ readDouble bs =
   let value = read (BS.unpack bs) :: Double
   in return value
 
-loop :: Int -> T2B a -> [a] -> T2B [a]
-loop n action acc =
-  if n <= 0
-    then return acc
-  else do
-    result <- action
-    let nextAcc = acc ++ [result]
-    loop (n - 1) action nextAcc
+loop :: (Int -> T2B a) -> Int -> T2B [a]
+loop action count = do
+  let
+    looper :: (Int -> T2B a) -> Int -> [a] -> T2B (Int, [a])
+    looper action' i acc =
+      if i >= count then
+        return (i, acc)
+      else do
+      result <- action' i
+      looper action' (i + 1) (acc ++ [result])
+  (_, results) <- looper action 0 []
+  return results
