@@ -1,46 +1,46 @@
-#include <antlr4-runtime.h>
-
+// Copyright (c) 2018, Tobechukwu Osakwe.
+//
+// All rights reserved.
+//
+// Use of this source code is governed by a
+// GPL license that can be found in the LICENSE file.
+#include <cstdint>
+#include <cstring>
+#include <ctime>
+#include <map>
+#include <vector>
+#include <fstream>
 #include <iostream>
-#include <memory>
+#include <sstream>
+#include <t2b/t2b.hpp>
 
-#include "T2BLexer.h"
-#include "T2BParser.h"
-#include "interpreter.h"
-#include "state.h"
+using namespace t2b;
 
-int main() {
-  auto scope = std::make_shared<t2b::Scope>();
+int main(int argc, const char **argv) {
+    string_map variables;
+    macro_map macros;
 
-  while (true) {
-    std::string line;
-    std::cout << "t2b> ";
-    getline(std::cin, line);
+    if (argc < 2) return exec(std::cin, std::cout, variables, macros);
 
-    antlr4::ANTLRInputStream inputStream(line);
-    t2b::T2BLexer lexer(&inputStream);
-    antlr4::CommonTokenStream tokens(&lexer);
-    t2b::T2BParser parser(&tokens);
+    if (strcmp(argv[1], "-h") == 0 || strcmp(argv[1], "--help") == 0) {
+        time_t rawtime;
+        struct tm *timeinfo;
 
-    auto expr = parser.expr();
-    t2b::Interpreter interpreter(scope);
-
-    antlrcpp::Any result = expr->accept(&interpreter);
-    if (result.is<std::shared_ptr<t2b::State>>()) {
-      auto state = result.as<std::shared_ptr<t2b::State>>();
-      switch (state->type) {
-        case t2b::State::Type::kDefault:
-        case t2b::State::Type::kReturned: {
-          if (state->return_value) {
-            state->return_value->Write(std::cout);
-            std::cout << std::endl;
-          }
-        } break;
-        case t2b::State::Type::kErrored: {
-          std::cout << "error: " << state->error_message << std::endl;
-        } break;
-      }
+        time(&rawtime);
+        timeinfo = localtime(&rawtime);
+        std::cout << "t2b 1.0: Copyright (c) 2018-" << (1900 + timeinfo->tm_year)
+                  << " Tobechukwu Osakwe: 2018-06-11"
+                  << std::endl;
+        std::cout << std::endl << "usage: t2b [filename]" << std::endl;
+        return 0;
     }
-  }
 
-  return 0;
+    std::ifstream ifs(argv[1]);
+
+    if (!ifs) {
+        std::cerr << "fatal error: could not open file" << std::endl;
+        return 1;
+    }
+
+    return exec(ifs, std::cout, variables, macros);
 }
