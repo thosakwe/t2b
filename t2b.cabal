@@ -66,16 +66,24 @@ executable t2b
     main-is:          Main.hs
 
     -- Modules included in this executable, other than Main.
-    -- other-modules:
+    other-modules:
+        T2B.Parser,
+        T2B.Scope
 
     -- LANGUAGE extensions used by modules in this package.
     -- other-extensions:
 
     -- Other library packages from which modules are imported.
-    build-depends:    base ^>=4.18.0.0
+    build-depends:
+        base ^>=4.18.0.0,
+        containers ^>=0.6.7,
+        parsec ^>=3.1.16.1,
+        text ^>=2.0.2
 
     -- Directories containing source files.
-    hs-source-dirs:   app
+    hs-source-dirs:
+        app,
+        app/T2B
 
     -- Base language which the package is written in.
     default-language: Haskell2010
