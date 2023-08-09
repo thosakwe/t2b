@@ -15,15 +15,20 @@ main :: IO ()
 main = do
   args <- getArgs
 
+  let filePath = case args of
+        [] -> "stdin"
+        inputFile:_ -> inputFile
+
   input <- case args of
     [] -> getContents
     inputFile:_ -> readFile inputFile
 
   result <- runT2B $ do
-    parseResult <- runParserT T2B.parser () "stdin" input
+    parseResult <- runParserT T2B.parser () filePath input
+
     case parseResult of
       Left err -> throwError $ SyntaxError err
-      Right _ -> return ()
+      Right bs -> return bs
 
   case result of
     Right byteString -> BS.putStr byteString
