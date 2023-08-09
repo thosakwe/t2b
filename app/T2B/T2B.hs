@@ -10,16 +10,18 @@ import Data.ByteString (ByteString)
 import Data.Text (Text)
 import System.IO (hPutStrLn, stderr)
 import T2B.Scope (Scope)
+import Text.Parsec (ParseError)
 
 import qualified T2B.Scope as Scope
 
 -- | The T2B monad represents a computation in the T2B language.
 -- It combines error handling, state management, output, and IO operations.
-type T2B a = ExceptT T2BError (WriterT ByteString (StateT T2BState IO)) a
+type T2B = ExceptT T2BError (WriterT ByteString (StateT T2BState IO))
 
 -- | Represents different error cases that can occur during T2B parsing.
 data T2BError
   = InvalidCommand Text -- ^ An error indicating an invalid command encountered during parsing.
+  | SyntaxError ParseError
   deriving (Show)
 
 -- | The state of the T2B parser, including the current scope of variables.
