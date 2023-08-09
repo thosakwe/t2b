@@ -6,6 +6,7 @@ import T2B.AST
 import qualified Text.Parsec.Token as Tok
 import Text.Parsec.String (Parser)
 import Text.Parsec.Language (emptyDef)
+import Text.Parsec.Token (commentLine, reservedNames)
 
 parser :: Parser [AstNode Command]
 parser = many command
@@ -82,6 +83,13 @@ expr = do
 lexer :: Tok.TokenParser ()
 -- lexer :: Tok.GenTokenParser Text () T2B
 lexer = Tok.makeTokenParser emptyDef
+  {
+    commentLine = "#",
+    reservedNames  = [
+      "d", "f", "hex", "i8", "i16", "i32", "i64", "u8", "u16", "u32", "u64",
+      "len", "size", "str", "strl", "times", "endtimes"
+    ]
+  }
 
 stringLiteral :: Parser (AstNode Expr)
 stringLiteral = do
