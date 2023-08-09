@@ -69,6 +69,7 @@ executable t2b
     other-modules:
         T2B,
         T2B.AST,
+        T2B.Interpreter,
         T2B.Parser,
         T2B.Scope
 

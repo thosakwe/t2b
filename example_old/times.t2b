@@ -5,7 +5,7 @@ times 2
     times 2
         times 2
             times 2
-                str loop!
+                str "loop!"
             endtimes
         endtimes
     endtimes

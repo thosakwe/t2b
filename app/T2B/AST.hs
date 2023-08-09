@@ -8,6 +8,7 @@ type Block = AstNode [AstNode Command]
 
 data Command =
   DCommand (AstNode Expr)
+  | EndlCommand
   | FCommand (AstNode Expr)
   | HexCommand
   | LenCommand (AstNode Expr)
@@ -21,5 +22,5 @@ data Expr =
   IntLiteral Int
   | DoubleLiteral Double
   | StringLiteral String
-  | Interpolation Expr
+  | Interpolation (AstNode Command)
   deriving (Show)
