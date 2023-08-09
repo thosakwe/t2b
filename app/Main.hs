@@ -5,11 +5,12 @@ import System.Environment
 import System.Exit (exitFailure)
 import System.IO (hPutStrLn, stderr)
 import T2B (runT2B, T2BError (InvalidCommand, SyntaxError))
-import Text.Parsec (runParserT)
+import Text.Parsec (parse)
 
 import qualified Data.ByteString.Char8 as BS
 import qualified Data.Text as Text
 import qualified T2B.Parser as T2B
+import Control.Monad.IO.Class (liftIO)
 
 main :: IO ()
 main = do
@@ -24,11 +25,15 @@ main = do
     inputFile:_ -> readFile inputFile
 
   result <- runT2B $ do
-    parseResult <- runParserT T2B.parser () filePath input
+    let parseResult = parse T2B.parser filePath input
+    -- parseResult <- runParserT T2B.parser () filePath input
 
     case parseResult of
       Left err -> throwError $ SyntaxError err
-      Right bs -> return bs
+      Right ast -> do
+        liftIO . putStrLn $ show ast
+        return BS.empty
+      -- Right bs -> return bs
 
   case result of
     Right byteString -> BS.putStr byteString

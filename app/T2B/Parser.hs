@@ -1,143 +1,108 @@
 module T2B.Parser where
 
-import Data.ByteString (ByteString)
-import Text.Parsec
-    ( alphaNum,
-      char,
-      letter,
-      oneOf,
-      choice,
-      (<|>),
-      many,
-      ParsecT, manyTill )
-import Text.Parsec.Token (GenLanguageDef(LanguageDef), commentStart, commentEnd, commentLine, nestedComments, identStart, identLetter, opStart, opLetter, reservedOpNames, reservedNames, caseSensitive)
-import T2B
+import Text.Parsec (choice, many, manyTill, getPosition)
+import T2B.AST
 
-import qualified Data.ByteString.Char8 as BS
 import qualified Text.Parsec.Token as Tok
-import Control.Monad.IO.Class (liftIO)
-import Control.Monad.RWS (modify)
-import Control.Monad.Trans (lift)
+import Text.Parsec.String (Parser)
+import Text.Parsec.Language (emptyDef)
 
-type Parser a = ParsecT String () (T2B) a
+parser :: Parser [AstNode Command]
+parser = many command
 
-parser :: Parser ByteString
-parser = do
-  byteStrings <- many $ choice [command]
-  return $ foldl (<>) BS.empty byteStrings
-
-command :: Parser ByteString
+command :: Parser (AstNode Command)
 command = do
   spaces
   choice $ [d, f, hex, len, strl, str]
 
-d :: Parser ByteString
+d :: Parser (AstNode Command)
 d = do
+  pos <- getPosition
   _ <- Tok.reserved lexer "d"
-  result <- expr
-  -- TODO (thosakwe): Hex mode
-  let value = (read $ BS.unpack result) :: Double
-  return . BS.pack $ show value
+  value <- expr
+  return $ (pos, DCommand value)
 
-f :: Parser ByteString
+f :: Parser (AstNode Command)
 f = do
+  pos <- getPosition
   _ <- Tok.reserved lexer "f"
-  result <- expr
-  -- TODO (thosakwe): Hex mode
-  let value = (read $ BS.unpack result) :: Double
-  return . BS.pack $ show value
+  value <- expr
+  return $ (pos, FCommand value)
 
-hex :: Parser ByteString
+hex :: Parser (AstNode Command)
 hex = do
+  pos <- getPosition
   _ <- Tok.reserved lexer "hex"
-  lift . modify $ \state -> state { hexMode = True }
-  return BS.empty
+  return $ (pos, HexCommand)
 
-len :: Parser ByteString
+len :: Parser (AstNode Command)
 len = do
+  pos <- getPosition
   _ <- Tok.reserved lexer "len"
-  result <- Tok.parens lexer command
-  return . BS.pack . show $ (length $ BS.unpack result)
+  value <- expr
+  return $ (pos, LenCommand value)
 
-size :: Parser ByteString
+size :: Parser (AstNode Command)
 size = do
+  pos <- getPosition
   _ <- Tok.reserved lexer "size"
-  result <- Tok.parens lexer command
-  return . BS.pack . show $ BS.length result
+  value <- expr
+  return $ (pos, SizeCommand value)
 
-str :: Parser ByteString
+str :: Parser (AstNode Command)
 str = do
+  pos <- getPosition
   _ <- Tok.reserved lexer "str"
-  expr
+  value <- expr
+  return $ (pos, StrCommand value)
 
-strl :: Parser ByteString
+strl :: Parser (AstNode Command)
 strl = do
+  pos <- getPosition
   _ <- Tok.reserved lexer "strl"
-  contents <- expr
-  return $ contents <> BS.pack "\n"
+  value <- expr
+  return $ (pos, StrlCommand value)
 
-times :: Parser ByteString
+times :: Parser (AstNode Command)
 times = do
+  pos <- getPosition
   _ <- Tok.reserved lexer "times"
-  countStr <- expr
-  let count = (read $ BS.unpack countStr) :: Int
-  -- This isn't gonna work, we're gonna need an actual AST now.
-  x <- manyTill command $ Tok.reserved lexer "endtimes"
+  count <- expr
+  commands <- manyTill command $ Tok.reserved lexer "endtimes"
   _ <- Tok.reserved lexer "endtimes"
-  return $ foldl (<>) BS.empty x
+  return $ (pos, TimesCommand count commands)
 
-expr :: Parser ByteString
+expr :: Parser (AstNode Expr)
 expr = do
   spaces
   choice [stringLiteral, float, integer, Tok.parens lexer expr]
 
 -- Create a lexer for integers, floats
 -- () is the state type for the TokenParser, which in this case has no state.
--- lexer :: Tok.TokenParser ()
-lexer :: Tok.GenTokenParser String () T2B
+lexer :: Tok.TokenParser ()
+-- lexer :: Tok.GenTokenParser Text () T2B
 lexer = Tok.makeTokenParser emptyDef
 
-emptyDef :: GenLanguageDef String () T2B
-emptyDef = LanguageDef
-  {
-    commentStart   = ""
-    , commentEnd     = ""
-    , commentLine    = "#"
-    , nestedComments = False
-    , identStart     = letter <|> char '_'
-    , identLetter    = alphaNum <|> oneOf "_'"
-    , opStart        = opLetter emptyDef
-    , opLetter       = oneOf ":!#$%&*+./<=>?@\\^|-~"
-    , reservedOpNames= []
-    , reservedNames  = [
-        "d", "f", "hex", "i8", "i16", "i32", "i64", "u8", "u16", "u32", "u64",
-        "len", "size", "str", "strl", "times", "endtimes"
-      ]
-    , caseSensitive  = True
-  }
+stringLiteral :: Parser (AstNode Expr)
+stringLiteral = do
+  pos <- getPosition
+  literal <- StringLiteral <$> Tok.stringLiteral lexer
+  return (pos, literal)
 
-stringLiteral :: Parser ByteString
-stringLiteral = BS.pack <$> Tok.stringLiteral lexer
-
-float :: Parser ByteString
+float :: Parser (AstNode Expr)
 float = do
-  value <- Tok.float lexer
-  return . BS.pack $ show value
+  pos <- getPosition
+  literal <- DoubleLiteral <$> Tok.float lexer
+  return (pos, literal)
 
-integer :: Parser ByteString
+integer :: Parser (AstNode Expr)
 integer = do
+  pos <- getPosition
   value <- Tok.integer lexer
-  return . BS.pack $ show value
+  let literal = IntLiteral $ fromIntegral value
+  return (pos, literal)
 
 spaces :: Parser ()
 spaces = do
   Tok.whiteSpace lexer
   return ()
-
--- float :: Parser Double
--- float = Tok.float lexer
-
--- integer :: Parser Double
--- integer = do
---   intValue <- Tok.integer lexer
---   return $ fromIntegral intValue

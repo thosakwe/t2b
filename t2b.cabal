@@ -68,6 +68,7 @@ executable t2b
     -- Modules included in this executable, other than Main.
     other-modules:
         T2B,
+        T2B.AST,
         T2B.Parser,
         T2B.Scope
 
