@@ -67,7 +67,7 @@ executable t2b
 
     -- Modules included in this executable, other than Main.
     other-modules:
-        T2B.Parser,
+        T2B,
         T2B.Scope
 
     -- LANGUAGE extensions used by modules in this package.
@@ -78,7 +78,8 @@ executable t2b
         base ^>=4.18.0.0,
         containers ^>=0.6.7,
         parsec ^>=3.1.16.1,
-        text ^>=2.0.2
+        text ^>=2.0.2,
+        transformers ^>=0.6.1.0
 
     -- Directories containing source files.
     hs-source-dirs:
