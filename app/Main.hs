@@ -1,6 +1,7 @@
 module Main where
 
 import Control.Monad.Error.Class (MonadError(throwError))
+import System.Environment
 import System.Exit (exitFailure)
 import System.IO (hPutStrLn, stderr)
 import T2B (runT2B, T2BError (InvalidCommand, SyntaxError))
@@ -12,7 +13,12 @@ import qualified T2B.Parser as T2B
 
 main :: IO ()
 main = do
-  input <- getContents
+  args <- getArgs
+
+  input <- case args of
+    [] -> getContents
+    inputFile:_ -> readFile inputFile
+
   result <- runT2B $ do
     parseResult <- runParserT T2B.parser () "stdin" input
     case parseResult of

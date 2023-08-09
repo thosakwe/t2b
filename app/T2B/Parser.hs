@@ -21,7 +21,7 @@ comment = do
   return ()
 
 command :: Parser ()
-command = choice [str, strl]
+command = choice $ map try [str, strl]
 
 str :: Parser ()
 str = do
@@ -32,6 +32,7 @@ str = do
 
 strl :: Parser ()
 strl = do
+  spaces
   _ <- string "strl"
   spaces
   contents <- expr
